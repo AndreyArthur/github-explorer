@@ -1,7 +1,7 @@
 import { FunctionComponent } from 'react';
 
-const App: FunctionComponent = () => (
-  <h1>Hello World</h1>
-);
+import Routes from './routes';
+
+const App: FunctionComponent = () => <Routes />;
 
 export default App;
