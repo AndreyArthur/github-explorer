@@ -1,13 +1,11 @@
 import { FunctionComponent } from 'react';
 
-const Dashboard: FunctionComponent = () => {
-  const text = 'Dashboard';
+import { Title } from './styles';
 
-  return (
-    <>
-      <h1>{text}</h1>
-    </>
-  );
-};
+const Dashboard: FunctionComponent = () => (
+  <>
+    <Title>Explore Repositórios no Github.</Title>
+  </>
+);
 
 export default Dashboard;
