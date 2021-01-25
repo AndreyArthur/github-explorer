@@ -12,6 +12,8 @@ export default createGlobalStyle`
     --text-primary: #3a3a3a;
     --text-secondary: #ffffff;
     --text-tertiary: #a8a8b3;
+    --text-quaternary: #3d3d4d;
+    --text-quintenary: #737380;
     --success: #04d361;
     --danger: #c53030;
   }
