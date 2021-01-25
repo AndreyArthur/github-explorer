@@ -9,7 +9,10 @@ export default createGlobalStyle`
     font-size: 62.5%;
 
     --background: #f0f0f5;
-    --title: #3a3a3a;
+    --text-primary: #3a3a3a;
+    --text-secondary: #ffffff;
+    --text-tertiary: #a8a8b3;
+    --success: #04d361;
   }
 
   * {
