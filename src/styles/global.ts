@@ -13,6 +13,7 @@ export default createGlobalStyle`
     --text-secondary: #ffffff;
     --text-tertiary: #a8a8b3;
     --success: #04d361;
+    --danger: #c53030;
   }
 
   * {

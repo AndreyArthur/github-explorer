@@ -1,90 +1,127 @@
-import { FunctionComponent } from 'react';
-import { FiChevronRight } from 'react-icons/fi';
-
-import logoImg from '../../assets/logo.svg';
-
 import {
-  Title, Form, Repositories, PageStyle,
+  FormEvent, FunctionComponent, useState, useEffect,
+} from 'react';
+import { FiChevronRight, FiTrash2 } from 'react-icons/fi';
+
+import api from '../../services/api';
+import logoImg from '../../assets/logo.svg';
+import {
+  Title, Form, Repositories, Error, PageStyle,
 } from './styles';
 
-const Dashboard: FunctionComponent = () => (
-  <>
-    <img src={logoImg} alt="Github Explorer" />
-    <Title>Explore Repositórios no Github.</Title>
+interface IRepository {
+  full_name: string;
+  description: string;
+  owner: {
+    login: string;
+    avatar_url: string;
+  }
+}
 
-    <Form>
-      <input type="text" placeholder="Digite aqui o nome do repositório..." />
-      <button type="submit">Mostrar</button>
-    </Form>
+const Dashboard: FunctionComponent = () => {
+  const [newRepo, setNewRepo] = useState('');
+  const [inputError, setInputError] = useState('');
+  const [repositories, setRepositories] = useState(() => {
+    const storagedRepositories = localStorage.getItem(
+      '@GithubExplorer:repositories',
+    );
 
-    <Repositories>
-      <a href="/#">
+    if (storagedRepositories) {
+      return JSON.parse(storagedRepositories) as IRepository[];
+    }
 
-        <img
-          src="https://picsum.photos/200"
-          alt="Profile"
+    return [] as IRepository[];
+  });
+
+  useEffect(() => {
+    localStorage.setItem(
+      '@GithubExplorer:repositories',
+      JSON.stringify(repositories),
+    );
+  }, [repositories]);
+
+  async function handleAddRepository(event: FormEvent): Promise<void> {
+    event.preventDefault();
+
+    setInputError('');
+
+    if (!newRepo) {
+      setTimeout(() => {
+        setInputError('Digite o nome do repositório antes de fazer a busca.');
+      }, 1);
+      return;
+    }
+
+    try {
+      const resource = await api.get(`repos/${newRepo}`);
+
+      const repository = resource.data as IRepository;
+
+      setRepositories([...repositories, repository]);
+      setNewRepo('');
+    } catch {
+      setInputError('Erro ao buscar o repositório.');
+    }
+  }
+
+  function deleteRepositories(): void {
+    localStorage.removeItem('@GithubExplorer:repositories');
+    setRepositories([] as IRepository[]);
+  }
+
+  return (
+    <>
+      <img src={logoImg} alt="Github Explorer" />
+      <Title>Explore Repositórios no Github.</Title>
+
+      <Form hasError={!!inputError} onSubmit={handleAddRepository}>
+        <input
+          value={newRepo}
+          onChange={(e) => setNewRepo(e.target.value)}
+          type="text"
+          placeholder="Digite aqui o nome do repositório..."
         />
+        <button type="submit">Mostrar</button>
+      </Form>
 
-        <div>
-          <strong>rocketseat/repo</strong>
-          <p>Repo description</p>
-        </div>
+      {inputError && <Error>{inputError}</Error>}
 
-        <FiChevronRight />
+      <Repositories>
+        {repositories[0]
+          && (
+          <button onClick={deleteRepositories} type="button">
+            Apagar Histórico
+            <FiTrash2 />
+          </button>
+          )}
+        {repositories.map((repository) => {
+          if (repository.owner !== undefined) {
+            return (
+              <a key={repository.full_name} href="/#">
 
-      </a>
+                <img
+                  src={String(repository.owner.avatar_url)}
+                  alt={String(repository.owner.login)}
+                />
 
-      <a href="/#">
+                <div>
+                  <strong>{repository.full_name}</strong>
+                  <p>{repository.description}</p>
+                </div>
 
-        <img
-          src="https://picsum.photos/200"
-          alt="Profile"
-        />
+                <FiChevronRight />
 
-        <div>
-          <strong>rocketseat/repo</strong>
-          <p>Repo description</p>
-        </div>
+              </a>
+            );
+          }
 
-        <FiChevronRight />
+          return <></>;
+        })}
+      </Repositories>
 
-      </a>
-
-      <a href="/#">
-
-        <img
-          src="https://picsum.photos/200"
-          alt="Profile"
-        />
-
-        <div>
-          <strong>rocketseat/repo</strong>
-          <p>Repo description</p>
-        </div>
-
-        <FiChevronRight />
-
-      </a>
-
-      <a href="/#">
-
-        <img
-          src="https://picsum.photos/200"
-          alt="Profile"
-        />
-
-        <div>
-          <strong>rocketseat/repo</strong>
-          <p>Repo description</p>
-        </div>
-
-        <FiChevronRight />
-
-      </a>
-    </Repositories>
-
-    <PageStyle />
-  </>
-);
+      <PageStyle />
+    </>
+  );
+};
 
 export default Dashboard;

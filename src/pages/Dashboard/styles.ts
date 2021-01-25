@@ -1,5 +1,11 @@
-import styled, { createGlobalStyle } from 'styled-components';
-import { cssVar, shade } from 'polished';
+import styled, { createGlobalStyle, css, keyframes } from 'styled-components';
+import {
+  cssVar, darken, shade,
+} from 'polished';
+
+interface FormProps {
+  hasError: boolean;
+}
 
 export const PageStyle = createGlobalStyle`
   img {
@@ -53,7 +59,7 @@ export const Title = styled.h1`
   color: var(--text-primary);
 `;
 
-export const Form = styled.form`
+export const Form = styled.form<FormProps>`
   display: flex;
 
   max-width: 70rem;
@@ -66,11 +72,15 @@ export const Form = styled.form`
     height: 7rem;
 
     padding: 0 2.4rem;
-    border: 0;
+    border: 0.2rem solid var(--text-secondary);
     border-radius: 0.5rem 0 0 0.5rem;
 
     font-size: 1.8rem;
     color: var(--text-primary);
+
+    ${(props) => props.hasError && css`
+      border-color: var(--danger);
+    `}
 
     &::placeholder {
       color: var(--text-tertiary);
@@ -98,10 +108,82 @@ export const Form = styled.form`
   }
 `;
 
+const errorAnimation = keyframes`
+  0% {
+    transform: translateX(0);
+  }
+
+  25% {
+    transform: translateX(2rem);
+  }
+
+  50% {
+    transform: translateX(0);
+  }
+
+  75% {
+    transform: translateX(2rem);
+  }
+
+  100% {
+    transform: translateX(0);
+  }
+`;
+
+export const Error = styled.span`
+  display: block;
+
+  margin: 1rem 0;
+
+  font-size: 1.8rem;
+  color: var(--danger);
+
+  animation: 500ms ${errorAnimation} ease both;
+`;
+
 export const Repositories = styled.div`
+  display: flex;
+  flex-direction: column-reverse;
+
   max-width: 70rem;
 
   margin-top: 8rem;
+
+  button {
+    align-self: flex-end;
+
+    width: 25rem;
+    height: 4rem;
+
+    border: 0;
+    border-radius: 0.5rem;
+    margin: 1.6rem 0;
+
+    background-color: var(--danger);
+
+    line-height: 4rem;
+    font-size: 1.8rem;;
+    color: var(--text-secondary);
+
+    transition: 200ms;
+
+    &:hover {
+      background-color: ${darken(0.05, String(cssVar('--danger', '#c53030')))};
+    }
+
+    svg {
+      position: relative;
+      top: 0.2rem;
+
+      margin-left: 0.5rem;
+
+      font-size: 2rem;
+    }
+  }
+
+  &:last-child {
+    margin-top: 0;
+  }
 
   a {
     display: flex;
@@ -109,6 +191,7 @@ export const Repositories = styled.div`
 
     width: 100%;
 
+    margin-top: 1.6rem;
     border-radius: 0.5rem;
     padding: 2.4rem;
 
@@ -118,9 +201,6 @@ export const Repositories = styled.div`
 
     transition: transform 200ms;
 
-    & + a {
-      margin-top: 1.6rem;
-    }
 
     &:hover {
       transform: translateX(2rem);
